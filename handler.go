@@ -27,11 +27,24 @@ func (r *Registry) Call(msg HubMessage) {
 	}
 }
 
+func reloadHandler(msg HubMessage) {
+	log.Println("received message to reload ...")
+	out, err := exec.Command("reload-docker.sh").Output()
+
+	if err != nil {
+		log.Println("ERROR EXECUTING COMMAND IN RELOAD HANDLER!!")
+		log.Println(err)
+		return
+	}
+
+	log.Println("output of reload-docker.sh is", string(out))
+}
+
 func MsgHandlers() Registry {
 	var handlers Registry
 
 	handlers.Add((&Logger{}).Call)
-	handlers.Add((&Mailgun{ServerConfig.Mailgun}).Call)
+	handlers.Add(&reloadHandler)
 
 	return handlers
 }
